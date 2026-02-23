@@ -4,13 +4,19 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: create-worktree-codex.sh <name> [base-ref]
+Usage: create-worktree-codex.sh [--app|--cli] <name> [base-ref]
 
 Creates a git worktree and launches Codex in that worktree.
+Worktree folders are named "<repo>-<worktree>" so Codex thread titles follow that format.
 
 Arguments:
   name       Worktree/branch name (for example: feature-login)
   base-ref   Optional base ref to branch from (default: current HEAD)
+
+Options:
+  --app      Open Codex desktop app
+  --cli      Open Codex CLI (default)
+  -h, --help Show this help
 
 Environment variables:
   WORKTREE_ROOT   Parent dir for worktrees (default: <repo>/_worktrees)
@@ -19,10 +25,36 @@ Environment variables:
 EOF
 }
 
-if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
-  usage
-  exit 0
-fi
+launch_mode="cli"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --app)
+      launch_mode="app"
+      shift
+      ;;
+    --cli)
+      launch_mode="cli"
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*)
+      echo "Error: unknown option '$1'" >&2
+      usage >&2
+      exit 1
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
 
 if [[ $# -lt 1 || $# -gt 2 ]]; then
   usage >&2
@@ -40,7 +72,8 @@ fi
 repo_root="$(git rev-parse --show-toplevel)"
 repo_name="$(basename "$repo_root")"
 worktree_root="${WORKTREE_ROOT:-$repo_root/_worktrees}"
-worktree_dir="$worktree_root/$name"
+worktree_folder="${repo_name}-${name}"
+worktree_dir="$worktree_root/$worktree_folder"
 branch="$name"
 
 mkdir -p "$worktree_root"
@@ -64,8 +97,28 @@ if [[ "${CODEX_NO_LAUNCH:-0}" == "1" ]]; then
   exit 0
 fi
 
-codex_cmd="${CODEX_CMD:-codex}"
+if [[ "$launch_mode" == "app" ]]; then
+  codex_cmd="${CODEX_CMD:-codex}"
+  if command -v "$codex_cmd" >/dev/null 2>&1; then
+    echo "Opening Codex desktop app with: $codex_cmd app $worktree_dir"
+    exec "$codex_cmd" app "$worktree_dir"
+  fi
 
+  if [[ "$OSTYPE" == darwin* ]] && [[ -d "/Applications/Codex.app" ]]; then
+    echo "Opening Codex.app (cwd=$worktree_dir)"
+    open -a "Codex" "$worktree_dir"
+    exit 0
+  fi
+
+  cat >&2 <<EOF
+Warning: --app was requested, but Codex.app was not found.
+Worktree is ready at:
+  $worktree_dir
+EOF
+  exit 1
+fi
+
+codex_cmd="${CODEX_CMD:-codex}"
 if command -v "$codex_cmd" >/dev/null 2>&1; then
   echo "Launching Codex with: $codex_cmd (cwd=$worktree_dir)"
   (
