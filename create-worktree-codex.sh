@@ -19,7 +19,7 @@ Options:
   -h, --help Show this help
 
 Environment variables:
-  WORKTREE_ROOT   Parent dir for worktrees (default: <repo>/_worktrees)
+  WORKTREE_ROOT   Parent dir for worktrees (default: <repo>/.worktrees)
   CODEX_CMD       Codex launch command (default: codex)
   CODEX_NO_LAUNCH Set to 1 to skip launching Codex
 EOF
@@ -71,7 +71,7 @@ fi
 
 repo_root="$(git rev-parse --show-toplevel)"
 repo_name="$(basename "$repo_root")"
-worktree_root="${WORKTREE_ROOT:-$repo_root/_worktrees}"
+worktree_root="${WORKTREE_ROOT:-$repo_root/.worktrees}"
 worktree_folder="${repo_name}-${name}"
 worktree_dir="$worktree_root/$worktree_folder"
 branch="$name"

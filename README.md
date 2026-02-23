@@ -71,14 +71,14 @@ CODEX_NO_LAUNCH=1 codextree feature-refactor
 Custom worktree parent directory:
 
 ```bash
-WORKTREE_ROOT="$HOME/worktrees" codextree --app feature-dashboard
+WORKTREE_ROOT="$HOME/.worktrees" codextree --app feature-dashboard
 ```
 
 ## Behavior details
 
 - Must be run inside a Git repository.
 - Worktrees are created under:
-  - default: `<repo>/_worktrees`
+  - default: `<repo>/.worktrees`
   - override: `$WORKTREE_ROOT`
 - New folder path is:
   - `<worktree-root>/<repo-folder>-<worktree-name>`
