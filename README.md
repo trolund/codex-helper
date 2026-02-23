@@ -1,22 +1,22 @@
-# codex-helper
+# codex-helper 🌳🤖
 
-Utilities for creating Git worktrees and launching Codex in the new worktree context.
+Utilities for creating Git worktrees and launching Codex in the new worktree context. 
 
-## What this gives you
+## What this gives you 🚀
 
 - `create-worktree-codex.sh`: creates a worktree and launches Codex.
 - `install-codextree.sh`: installs the script to `~/.local/bin` and adds alias `codextree` to `~/.zshrc`.
 - Worktree folder naming format: `<repo-folder>-<worktree-name>`.
   - This helps Codex thread names follow the same format.
 
-## Requirements
+## Requirements 🛠️
 
 - macOS or Linux shell with `bash`
 - `git`
 - `zsh` (for alias install flow)
 - Codex CLI (`codex`) for best desktop launch behavior
 
-## Install
+## Install ⚡️
 
 From this project directory:
 
